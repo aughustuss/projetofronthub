@@ -17,7 +17,7 @@ import Title from "./Title";
 const Banner = () => {
   const {addMovie} = React.useContext(FavoritesMoviesContext)
   const [popularMovies, setPopularMovies] = React.useState<MovieModel[]>([]);
-  const [upComingMovies, setUpComingMovies] = React.useState<MovieModel[]>([]);
+  const [upComingMovies, setUpComingMovies] = React.useState<MovieModel[] >([]);
   
   const [loadingMovies, setLoadingMovies] = React.useState<boolean>(false);
   
@@ -64,14 +64,14 @@ const Banner = () => {
                       className="rounded-lg object-cover h-full w-full"
                     />
                     <div className="bg-black absolute inset-0 h-full z-10 w-full opacity-25 rounded-lg" />
-                    <button onClick={() => addMovie(movie)} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-full bg-primaryNeon text-iconSize font-black z-40 hover:bg-primaryOnHover transition duration-300 active:scale-95 ">
+                    <button onClick={() => addMovie(movie)} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-full bg-primary text-iconSize font-black z-40 hover:bg-primaryOnHover transition duration-300 active:scale-95 ">
                       <BsPlus />
                     </button>
                   </div>
                 </div>
                 {/* Titulo e assista ao trailer */}
                 <div className="absolute right-1/2 lg:right-1/4 top-16 lg:top-auto lg:bottom-1/3 translate-x-1/2 lg:translate-y-1/2 w-full max-w-[260px] lg:max-w-[200px] xl:max-w-[300px] text-center z-20 flex flex-row items-center h-[60px] gap-x-2">
-                  <a className="border-2 border-primaryNeon p-3 rounded-full flex flex-col items-center justify-center text-iconSize hover:bg-primaryNeon cursor-pointer transition duration-300">
+                  <a href="/trailer" className="border-2 border-primaryNeon p-3 rounded-full flex flex-col items-center justify-center text-iconSize hover:bg-primaryNeon cursor-pointer transition duration-300">
                     <BsPlayFill />
                   </a>
                   <div className="flex flex-col gap-y-0 justify-center h-full w-full text-start">
@@ -101,9 +101,9 @@ const Banner = () => {
                     className="w-full h-[100px] object-cover rounded-lg"
                   />
                   <div className="flex flex-col gap-y-4 text-body text-bodyColor">
-                    <p className="font-title text-subTitle font-black">
+                    <a href={`/movie/${movie.id}`} className="font-title text-subTitle font-black">
                       {movie.original_title}
-                    </p>
+                    </a>
                     <p className="line-clamp-2 text-body">
                       {movie.overview}...
                     </p>

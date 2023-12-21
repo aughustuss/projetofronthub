@@ -16,12 +16,17 @@ import Loading from "views/Loading";
 import { MovieModel } from "models/entities/Movie";
 import FavoritesMoviesContext from "contexts/FavoritesMoviesContext";
 import Button from "./Button";
+import WatchedListContext from "contexts/WatchedListContext";
 interface MovieInfoProps {
   movieId?: string;
 }
 const MovieInfo = ({ movieId }: MovieInfoProps) => {
+  
   const [movieById, setMovieById] = React.useState<MovieByIdModel>();
-  const {addMovie} = React.useContext(FavoritesMoviesContext);
+  const [movieExists, setMovieExists] = React.useState<boolean>(false);
+  const [movieExistsInFavorites, setMovieExistsInFavorites] = React.useState<boolean>(false);
+  const {addMovie, movieAlreadyAdded, checkIfMovieExistsInFavorites} = React.useContext(FavoritesMoviesContext);
+  const {addToWatchedList, checkIfMovieExists, alreadyAdded} = React.useContext(WatchedListContext);
   const tmdbImagePath = import.meta.env.VITE_THE_MOVIE_DB_IMG_PATH;
   const [isLoading, setIsLoading] = React.useState(false);
   const movieHours = movieById?.runtime && Math.floor(movieById?.runtime / 60);
@@ -44,7 +49,7 @@ const MovieInfo = ({ movieId }: MovieInfoProps) => {
       title: movieById?.title,
       video: movieById?.video,
       vote_average: movieById?.vote_average,
-      vote_count: movieById?.vote_count
+      vote_count: movieById?.vote_count,
     }
   }
 
@@ -63,6 +68,10 @@ const MovieInfo = ({ movieId }: MovieInfoProps) => {
   };
 
   React.useEffect(() => {
+    const mExists = checkIfMovieExists(Number(movieId));
+    const mExistsInF = checkIfMovieExistsInFavorites(Number(movieId));
+    setMovieExists(mExists);
+    setMovieExistsInFavorites(mExistsInF);
     const fetchMovieById = async () => {
       try {
         setIsLoading(true);
@@ -84,7 +93,9 @@ const MovieInfo = ({ movieId }: MovieInfoProps) => {
       }
     };
     fetchMovieById();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [movieId]);
+
   if (isLoading) return <Loading big />;
 
   return (
@@ -101,7 +112,7 @@ const MovieInfo = ({ movieId }: MovieInfoProps) => {
       </div>
 
       {/* Sinopse do banner */}
-      <div className="h-[600px] text-body ">
+      <div className="h-[1100px] sm:h-[1000px] md:h-[800px] lg:h-[600px] text-body ">
         <div className="h-auto min-h-[700px] bg-primaryBgBorder w-full px-4 md:w-[85%] md:px-0 mx-auto -mt-[30%] md:-mt-[10%] shadow-md rounded-lg absolute left-1/2 -translate-x-1/2">
           {/* Início da sinopse  */}
           <div className="p-4 md:p-8 flex flex-col gap-y-4">
@@ -116,7 +127,7 @@ const MovieInfo = ({ movieId }: MovieInfoProps) => {
                 <div className="flex flex-col gap-2">
                   <div className="flex flex-col md:flex-row items-baseline justify-between gap-2">
                     <div className="flex flex-row items-baseline gap-2 flex-wrap">
-                      <p className="font-title font-black text-movieSlideTitle">
+                      <div className="font-title font-black text-movieSlideTitle">
                         {movieById?.original_title}{" "}
                         <span className="font-normal text-title">
                           {" "}
@@ -128,14 +139,23 @@ const MovieInfo = ({ movieId }: MovieInfoProps) => {
                             : <span className="py-1 px-2 bg-slate-200 rounded-lg text-body w-fit text-sm">Esta para lançar</span>
                             }
                       
-                      </p>
+                      </div>
                     </div>
                     {/* Marcar como assistido */}
                     {/* <button className="bg-primary hover:bg-primaryOnHover transition duration-300 py-3 px-8 rounded-lg relative flex flex-row items-center font-black shadow-md active:scale-95">
                       Marcar como assistido{" "}
                       <FaCheck className="absolute right-2" />
                     </button> */}
-                    <Button small={false} green onlyBorder={false} type="button">Marcar como assistido<FaCheck/></Button>
+                    {!movieExists && !alreadyAdded
+                    ? 
+                    (
+                      <Button onClick={() => { if(movieById?.id) addToWatchedList(movieById?.id)}} small={false} green onlyBorder={false} type="button"><FaCheck/>Marcar como assistido</Button>
+                    ) 
+                    
+                    : 
+                    (
+                      <Button disabled small={false} green onlyBorder={false} type="button">Filme marcado como assistido</Button>
+                    )}
                   </div>
                   <p className="text-body text-bodyColor italic">
                     {movieById?.tagline}
@@ -233,7 +253,7 @@ const MovieInfo = ({ movieId }: MovieInfoProps) => {
               <p className="font-title font-black text-subTitle">
                 Produzido por
               </p>
-              <div className="flex flex-row items-center flex-wrap gap-4">
+              <div className="flex flex-row items-center gap-4">
                 {movieById?.production_companies.map(
                   (company: MovieByIdCompaniesModel) => (
                     <div
@@ -255,14 +275,18 @@ const MovieInfo = ({ movieId }: MovieInfoProps) => {
               </div>
             </div>
           </div>
-          <button onClick={() => addMovie(movieInfosToAddInFavoriteList)} className="absolute -right-0 -top-10 bg-newBlack rounded-full p-6 font-black text-title text-primaryNeon hover:scale-105 transition duration-300 mr-2 shadow-md">
-            <BsPlus />
+          {!movieAlreadyAdded && !movieExistsInFavorites ? (
+
+          <button onClick={() => addMovie(movieInfosToAddInFavoriteList)} className="absolute -right-0 -top-10 bg-newBlack rounded-full p-4 font-black text-title text-primaryNeon active:scale-95 transition duration-300 mr-2 shadow-md">
+            <BsPlus className="text-4xl" />
           </button>
+          ) : (
+            <button onClick={() => addMovie(movieInfosToAddInFavoriteList)} className="absolute -right-0 -top-10 bg-newBlack/90 rounded-full p-5 font-black text-title text-primaryNeon/90 transition duration-300 mr-2 shadow-md cursor-not-allowed">
+            <FaCheck className="text-2xl" />
+          </button>
+          )}
         </div>
       </div>
-
-      {/* Corpo */}
-      <div className="w-full px-4 md:w-[90%] md:px-0 mx-auto"></div>
     </main>
   );
 };

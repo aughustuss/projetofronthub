@@ -5,15 +5,20 @@ import "./index.css";
 import { SideBarContextProvider } from "contexts/SidebarContext.tsx";
 import { FavoritesMoviesContextProvider } from "contexts/FavoritesMoviesContext.tsx";
 import { LastTitleContextProvider } from "contexts/LastSearchedTitle.tsx";
-
+import { WatchedListContextProvider } from "contexts/WatchedListContext.tsx";
+import { LoginContextProvider } from "contexts/LoginContext.tsx";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <LastTitleContextProvider>
-      <FavoritesMoviesContextProvider>
-        <SideBarContextProvider>
-          <App />
-        </SideBarContextProvider>
-      </FavoritesMoviesContextProvider>
-    </LastTitleContextProvider>
+    <LoginContextProvider>
+      <LastTitleContextProvider>
+        <WatchedListContextProvider>
+          <FavoritesMoviesContextProvider>
+            <SideBarContextProvider>
+              <App />
+            </SideBarContextProvider>
+          </FavoritesMoviesContextProvider>
+        </WatchedListContextProvider>
+      </LastTitleContextProvider>
+    </LoginContextProvider>
   </React.StrictMode>
 );
